@@ -16,7 +16,9 @@ from pathlib import Path
 
 from . import OUT_DIR
 from .sources import news
-from .tripwires import TRIPWIRES
+from .tripwires import TRIPWIRES, WATCH
+
+TOPICS = {**TRIPWIRES, **WATCH}
 
 SCHEMA = {
     "type": "object",
@@ -27,7 +29,7 @@ SCHEMA = {
             "type": "object",
             "required": ["tripwire", "verdict", "summary", "why", "sources"],
             "properties": {
-                "tripwire": {"type": "string", "enum": list(TRIPWIRES)},
+                "tripwire": {"type": "string", "enum": list(TOPICS)},
                 "verdict": {"type": "string", "enum": ["fire", "watch", "noise"]},
                 "summary": {"type": "string"},
                 "why": {"type": "string"},
@@ -55,6 +57,10 @@ For each tripwire that has headlines, decide:
 - "watch": something real and related happened but falls short of the definition, or a
   dated event coming up could trigger it.
 - "noise": nothing real behind the headlines.
+Topics marked WATCH ONLY can never be "fire": use "watch" or "noise" for them.
+For ai_incident both halves must be true to fire: an AI system actually caused deaths or
+major damage, AND a government responded with binding restrictions (not just hearings,
+studies or proposed bills).
 Use web search to confirm anything that is not clearly noise. Be strict: a false alarm
 costs the owner more than a day's delay. You are made by Anthropic, so for anything about
 Anthropic be especially careful to judge it exactly as you would any other company.
@@ -89,8 +95,9 @@ def build_prompt(hits, manual):
     fired = [k for k, v in manual.get("tripwires", {}).items() if v.get("status") == "fired"]
     lines = []
     for tid, heads in hits.items():
-        desc, plain = TRIPWIRES[tid]
-        lines.append(f"\n## {tid}: {desc} [{plain}]")
+        desc, plain = TOPICS[tid]
+        tag = " (WATCH ONLY)" if tid in WATCH else ""
+        lines.append(f"\n## {tid}{tag}: {desc} [{plain}]")
         for h in heads:
             lines.append(f"- {h['date']} | {h['source']} | {h['title']} | {h['link']}")
     return PROMPT.format(today=date.today().isoformat(), fired=", ".join(fired) or "none",
@@ -128,7 +135,7 @@ def write_html(res, hits):
             f' <span class="m">{html.escape(s["outlet"])} {html.escape(s.get("date", ""))}</span></li>'
             for s in v["sources"])
         cards.append(f"""<article class="{v['verdict']}"><div class="tag">{label[v['verdict']]}</div>
-<h2>{html.escape(TRIPWIRES[v['tripwire']][1])}</h2>
+<h2>{html.escape(TOPICS[v['tripwire']][1])}</h2>
 <p>{html.escape(v['summary'])}</p><p class="m">{html.escape(v['why'])}</p>
 {'<ul>' + src + '</ul>' if src else ''}</article>""")
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">

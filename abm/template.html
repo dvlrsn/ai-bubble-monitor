@@ -291,7 +291,7 @@ td .src { color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
     </section>
     <section class="panel">
       <header><span class="eyebrow">Headline scan, last 3 days</span><h2>Possible tripwires to review</h2>
-        <p class="muted">Keyword matches from Google News. Most are noise; none of these has fired anything.</p></header>
+        <p class="muted">Keyword matches from Google News. Most are noise; none of these has fired anything. "Watch only" topics never fire.</p></header>
       <div class="news" id="news"></div>
     </section>
   </div>
@@ -450,7 +450,7 @@ td .src { color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
       <span>${esc(t.desc)}${t.date ? ` <span class="muted">(${esc(t.date)})</span>` : ""}</span></li>`).join("");
   const news = Object.entries(D.news || {});
   $("news").innerHTML = news.length ? news.map(([tid, items]) => `
-    <div><h3>${esc((D.tripwires.find((t) => t.id === tid) || {}).desc || tid)}</h3>
+    <div><h3>${esc((D.tripwires.find((t) => t.id === tid) || (D.watch || []).find((w) => w.id === tid) || {}).desc || tid)}${(D.watch || []).some((w) => w.id === tid) ? ` <span class="chip none">Watch only</span>` : ""}</h3>
       <ul>${items.slice(0, 3).map((h) => `<li><a href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.title)}</a> <span class="meta">${esc(h.date)}</span></li>`).join("")}</ul></div>`).join("")
     : `<p class="muted">No headline scan in this run.</p>`;
   $("health").innerHTML = D.health.length ? D.health.map((h) =>

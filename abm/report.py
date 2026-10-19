@@ -6,7 +6,7 @@ from pathlib import Path
 
 from . import OUT_DIR
 from .indicators import BY_ID, INDICATORS, PILLARS
-from .tripwires import TRIPWIRES
+from .tripwires import TRIPWIRES, WATCH
 
 TEMPLATE = Path(__file__).with_name("template.html")
 
@@ -83,6 +83,7 @@ def payload(ev, rg, easy, ec, hist, manual, news, fetch_status):
         "manual_start": min(starts) if starts else ev["date"],
         "tripwires": tw,
         "news": news or {},
+        "watch": [{"id": k, "desc": d, "plain": p} for k, (d, p) in WATCH.items()],
         "health": health(ev, fetch_status),
         "catalysts": cats,
     }

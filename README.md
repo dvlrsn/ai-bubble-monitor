@@ -71,13 +71,15 @@ The most useful ones to keep fresh:
 
 ## Tripwires (brief §11)
 
-These are 16 binary events, such as a hyperscaler cutting capex, a CoreWeave covenant breach or Oracle being cut to junk. Each confirmed one lifts the risk level: one tripwire means at least Cracking, two mean Unwind. The headline scan only *proposes* candidates (expert mode, "Possible tripwires to review"). A tripwire fires only when you record it with two credible sources:
+These are 17 binary events, such as a hyperscaler cutting capex, a CoreWeave covenant breach or Oracle being cut to junk. `ai_incident` needs both halves: an AI system causes deaths or major damage, *and* governments respond with binding restrictions. Markets shrugged off the July 2026 Hugging Face breach, so the damage would come from the rules that follow a disaster. Each confirmed one lifts the risk level: one tripwire means at least Cracking, two mean Unwind. The headline scan only *proposes* candidates (expert mode, "Possible tripwires to review"). A tripwire fires only when you record it with two credible sources:
 
 ```bash
 python monitor.py tripwire list
 python monitor.py tripwire fire capex_cut --source https://... --source https://... --note "Meta: 2027 capex 'digestion'"
 python monitor.py tripwire clear capex_cut
 ```
+
+Three **watch topics** (insurers excluding AI risk, companies pausing AI agents, AI laws with real teeth) appear in the headline scan and the AI review marked "Watch only". They never fire and never change the risk level.
 
 A fired tripwire counts for 120 days (change it with `--expires`).
 

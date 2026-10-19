@@ -180,8 +180,9 @@ def cmd_review(a):
     print(f"\n{res['overall']}\n")
     for v in res["verdicts"]:
         if v["verdict"] != "noise":
-            print(f"[{v['verdict'].upper():5}] {TRIPWIRES[v['tripwire']][1]}\n        {v['summary']}")
-    fires = [v for v in res["verdicts"] if v["verdict"] == "fire" and len(v["sources"]) >= 2]
+            print(f"[{v['verdict'].upper():5}] {review.TOPICS[v['tripwire']][1]}\n        {v['summary']}")
+    fires = [v for v in res["verdicts"] if v["verdict"] == "fire" and len(v["sources"]) >= 2
+             and v["tripwire"] in TRIPWIRES]
     if not fires:
         print("\nNothing to fire. The full review is open in your browser.")
         return

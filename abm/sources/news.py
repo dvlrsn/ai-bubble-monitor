@@ -29,6 +29,12 @@ QUERIES = {
     "geopolitics": ['(Taiwan blockade OR "export controls" chips OR "grid emergency" data centers)'],
     "depreciation": ['(Microsoft OR Alphabet OR Amazon OR Meta) (server useful life shorten OR impairment AI)'],
     "going_concern": ['AI (data center OR infrastructure) "going concern"'],
+    "ai_incident": ['AI (agent OR model OR system) (killed OR deaths OR casualties OR "critical infrastructure") incident',
+                    'AI incident (emergency rules OR moratorium OR "deployment pause" OR ban OR liability)'],
+    # Watch topics (never fire).
+    "insurer_exclusions": ['insurers (exclude OR exclusion OR withdraw OR "pull back") AI (liability OR coverage OR risks)'],
+    "agent_pauses": ['(pauses OR halts OR suspends OR "rolls back") "AI agents" (after OR incident OR error OR outage)'],
+    "ai_laws": ['AI (law OR act OR ruling) (liability OR licensing OR ban OR enforcement OR fine) (signed OR passed OR court OR regulator)'],
 }
 
 

@@ -36,11 +36,28 @@ TRIPWIRES = {
                     "The Fed raised rates and signalled more while long-term rates are very high."),
     "geopolitics": ("China-Taiwan escalation, new export controls, or grid emergency limits on data centers",
                     "A political shock (Taiwan, export bans, power limits) is hitting the chip supply chain."),
+    # Both halves are needed: markets shrugged off the July 2026 Hugging Face breach, and
+    # the lasting damage would come from the rules and liability that follow a disaster.
+    "ai_incident": ("An AI system causes deaths or major damage AND governments respond with emergency rules, "
+                    "deployment pauses, bans or liability rulings that slow AI use",
+                    "An AI disaster hurt people, and governments are now restricting AI because of it."),
     # Accounting
     "depreciation": ("A hyperscaler shortens server useful lives or impairs AI assets",
                      "A big tech company admitted its AI equipment is worth less than its books said."),
     "going_concern": ("Going-concern language or auditor problems at an AI infrastructure company",
                       "Auditors doubt an AI infrastructure company can survive."),
+}
+
+# Watch topics: slower signs that AI is getting harder or costlier to use. The headline scan
+# and the AI review show them, but they never fire and never change the risk level.
+WATCH = {
+    "insurer_exclusions": ("Insurers exclude, withdraw or sharply reprice cover for AI-caused damage",
+                           "Insurers are refusing to cover damage caused by AI."),
+    "agent_pauses": ("Large companies pause or roll back AI agents after an incident or failure",
+                     "Big companies are pulling back AI agents after something went wrong."),
+    "ai_laws": ("New AI laws, enforcement or court rulings with real teeth: deployment limits, licensing, "
+                "liability for AI makers",
+                "New AI laws or court rulings are making AI slower or more expensive to use."),
 }
 
 # Stages of a typical bust (brief section 3); order can vary.
