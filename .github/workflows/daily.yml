@@ -1,0 +1,78 @@
+name: Daily check
+
+# Runs once a day after the US close has settled in the free sources.
+# Push alerts go out only when the risk level changes or a tripwire fires.
+on:
+  schedule:
+    - cron: "0 5 * * *"   # 05:00 UTC = 06:00/07:00 Swedish time
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write   # only for the keepalive step below
+
+concurrency:
+  group: bubble-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # The archive (and the last snapshot that alerts compare against) lives in the
+      # Actions cache: each run restores the newest copy and saves a new one.
+      - name: Restore archive
+        uses: actions/cache@v4
+        with:
+          path: data/monitor.db
+          key: monitor-db-${{ github.run_id }}
+          restore-keys: monitor-db-
+
+      - name: Fetch, score, alert
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: python monitor.py run
+
+      # GitHub turns off schedules in public repos after 60 days without commits, and this
+      # repo rarely gets any. Re-enabling the workflow once a month resets that clock.
+      - name: Keep the schedule alive
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [ "$(date -u +%d)" = "01" ] || exit 0
+          gh api -X PUT "repos/${{ github.repository }}/actions/workflows/daily.yml/enable"
+
+      - name: Keep the dashboard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard
+          path: |
+            out/dashboard.html
+            out/latest.json
+          retention-days: 14
+          if-no-files-found: ignore
+
+      # A silent failure would look like "all calm", so say so on the phone.
+      - name: Alert on failure
+        if: failure()
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          [ -n "$NTFY_TOPIC" ] || exit 0
+          curl -sS -H "Title: AI Bubble Monitor run failed" -H "Tags: warning" -H "Click: $RUN_URL" \
+            -d "Today's check did not finish, so no alert means nothing. Tap to see the log." \
+            "https://ntfy.sh/$NTFY_TOPIC"

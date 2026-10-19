@@ -1,0 +1,5 @@
+# The archive is rebuilt by fetching and kept between Actions runs in the cache, not in git.
+data/monitor.db
+data/config.json
+out/
+__pycache__/

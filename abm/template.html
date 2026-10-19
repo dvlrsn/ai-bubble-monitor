@@ -1,0 +1,534 @@
+<title>AI Bubble Monitor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a storm-warning bulletin. One warning-level hero, then plain answers
+   (easy) or the full instrument panel (expert), all on a cool slate ground. */
+:root {
+  --bg: #f3f5f7;
+  --surface: #ffffff;
+  --ink: #131820;
+  --ink-2: #4a5361;
+  --muted: #6c7686;
+  --line: #dde2e8;
+  --line-strong: #c4cbd4;
+  --accent: #2459c9;
+  --accent-wash: #e6edfb;
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --good: #0ca30c;
+  --warn: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+  --good-wash: #e3f3e3;
+  --warn-wash: #fdf1d6;
+  --serious-wash: #fce6dc;
+  --critical-wash: #f8e0e0;
+  --good-ink: #0b6b0b;
+  --warn-ink: #7a5300;
+  --serious-ink: #8e3a17;
+  --critical-ink: #9c2323;
+  --zone: rgba(19, 24, 32, 0.035);
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1115; --surface: #161a20; --ink: #e8ecf1; --ink-2: #b8c0cc; --muted: #8b95a4;
+    --line: #262c35; --line-strong: #353d48; --accent: #7aa2ff; --accent-wash: #1b2640;
+    --s1: #3987e5; --s2: #d95926;
+    --good-wash: #12261a; --warn-wash: #2a2210; --serious-wash: #2c1a12; --critical-wash: #2c1414;
+    --good-ink: #5fd35f; --warn-ink: #f5c453; --serious-ink: #f2a07e; --critical-ink: #f08080;
+    --zone: rgba(232, 236, 241, 0.035);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1115; --surface: #161a20; --ink: #e8ecf1; --ink-2: #b8c0cc; --muted: #8b95a4;
+  --line: #262c35; --line-strong: #353d48; --accent: #7aa2ff; --accent-wash: #1b2640;
+  --s1: #3987e5; --s2: #d95926;
+  --good-wash: #12261a; --warn-wash: #2a2210; --serious-wash: #2c1a12; --critical-wash: #2c1414;
+  --good-ink: #5fd35f; --warn-ink: #f5c453; --serious-ink: #f2a07e; --critical-ink: #f08080;
+  --zone: rgba(232, 236, 241, 0.035);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 400 16px/1.5 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 20px; }
+h1, h2, h3 { font-family: var(--f-display); font-stretch: 85%; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: 1.3rem; font-weight: 700; }
+h3 { font-size: 1.02rem; font-weight: 700; }
+p { margin: 0; }
+.eyebrow { font: 600 0.72rem/1.2 var(--f-body); text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); }
+.mono { font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+/* Top bar */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+  margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  padding: 12px max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px));
+}
+.top-in { max-width: 1080px; margin: 0 auto; display: flex; gap: 12px 20px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+.brand { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.brand h1 { font-size: 1.25rem; font-weight: 800; }
+.brand .asof { font-size: 0.85rem; color: var(--muted); }
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 999px; padding: 3px; }
+.seg button {
+  font: 600 0.9rem/1 var(--f-body); color: var(--ink-2); background: transparent; border: 0;
+  padding: 8px 16px; border-radius: 999px; cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+/* Hero: the warning level */
+.hero {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 0; overflow: hidden;
+  margin-top: 20px;
+}
+.hero-main { padding: 24px; display: grid; gap: 14px; align-content: start; border-left: 8px solid var(--lvl); }
+.hero-side { padding: 24px; display: grid; gap: 18px; align-content: start; border-left: 1px solid var(--line); }
+.lvl-name { font: 800 clamp(2.4rem, 7vw, 3.6rem)/0.95 var(--f-display); font-stretch: 78%; letter-spacing: -0.02em; display: flex; align-items: center; gap: 14px; }
+.lvl-badge { font: 700 0.8rem/1 var(--f-data); padding: 6px 8px; border-radius: 6px; background: var(--lvl-wash); color: var(--lvl-ink); letter-spacing: 0; }
+.headline { font-size: 1.15rem; line-height: 1.45; max-width: 46ch; }
+.scale { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.scale div { display: grid; gap: 6px; }
+.scale i { display: block; height: 8px; border-radius: 4px; background: var(--line); }
+.scale span { font-size: 0.78rem; color: var(--muted); }
+.scale .on i { background: var(--c); }
+.scale .on span { color: var(--ink); font-weight: 700; }
+.meter { display: grid; gap: 6px; }
+.meter-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.meter-head b { font: 700 1.6rem/1 var(--f-display); font-stretch: 85%; }
+.meter-bar { position: relative; height: 10px; border-radius: 5px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--good) 30%, var(--surface)) 0 33%,
+    color-mix(in srgb, var(--warn) 38%, var(--surface)) 33% 66%,
+    color-mix(in srgb, var(--critical) 34%, var(--surface)) 66% 100%); }
+.meter-bar i { position: absolute; top: -3px; width: 4px; height: 16px; border-radius: 2px; background: var(--ink); transform: translateX(-2px); }
+.meter p { font-size: 0.92rem; color: var(--ink-2); }
+
+/* Sections */
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.panel > header { display: grid; gap: 4px; }
+.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.list li { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 10px; align-items: start; }
+.dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 7px; background: var(--muted); }
+.dot.green { background: var(--good); } .dot.amber { background: var(--warn); } .dot.red { background: var(--critical); }
+.callout { background: var(--accent-wash); border-radius: 8px; padding: 14px 16px; font-size: 0.98rem; }
+
+/* Bust path */
+.path { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.path li { display: grid; gap: 8px; align-content: start; }
+.path .bar { height: 8px; border-radius: 4px; background: var(--line); }
+.path .done .bar { background: var(--critical); }
+.path .starting .bar { background: linear-gradient(90deg, var(--warn) 50%, var(--line) 50%); }
+.path .st { font: 600 0.72rem/1.2 var(--f-body); text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+.path .done .st { color: var(--critical-ink); } .path .starting .st { color: var(--warn-ink); }
+.path p { font-size: 0.88rem; line-height: 1.35; }
+.path .num { font: 500 0.75rem/1 var(--f-data); color: var(--muted); }
+
+/* Catalysts */
+.cal { list-style: none; margin: 0; padding: 0; display: grid; }
+.cal li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-top: 1px solid var(--line); }
+.cal li:first-child { border-top: 0; padding-top: 0; }
+.cal .when { display: grid; gap: 2px; align-content: start; }
+.cal .when b { font: 700 1.05rem/1 var(--f-display); font-stretch: 85%; }
+.cal .when span { font: 500 0.72rem/1 var(--f-data); color: var(--muted); }
+.cal .ev { display: grid; gap: 3px; }
+.cal .ev strong { font-weight: 700; }
+.cal .ev p { font-size: 0.93rem; color: var(--ink-2); }
+
+/* Chart */
+.chart-box { position: relative; }
+.chart-box svg { display: block; width: 100%; height: auto; overflow: visible; }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.88rem; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend i { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
+.tip {
+  position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line-strong);
+  border-radius: 8px; padding: 8px 10px; font-size: 0.85rem; box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  display: grid; gap: 3px; min-width: 150px; z-index: 3;
+}
+.tip .row { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.tip .row span { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.tip .row i { width: 10px; height: 3px; border-radius: 2px; display: inline-block; }
+
+/* Expert */
+.composites { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.composites > div { padding: 16px 20px; display: grid; gap: 4px; border-left: 1px solid var(--line); min-width: 0; }
+.composites > div:first-child { border-left: 0; }
+.composites b { font: 700 1.9rem/1 var(--f-display); font-stretch: 85%; }
+.composites p { font-size: 0.86rem; color: var(--ink-2); }
+.pillars { display: grid; gap: 14px; }
+.pillar { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.pillar > summary { list-style: none; cursor: pointer; padding: 14px 18px; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+.pillar > summary::-webkit-details-marker { display: none; }
+.pillar .code { font: 500 0.85rem/1 var(--f-data); color: var(--muted); }
+.pillar .pname { display: grid; gap: 2px; min-width: 0; }
+.pillar .pname small { color: var(--muted); font-size: 0.85rem; }
+.pscore { display: flex; align-items: center; gap: 10px; }
+.pscore .track { width: 120px; height: 6px; border-radius: 3px; background: var(--line); position: relative; overflow: hidden; }
+.pscore .track i { position: absolute; inset: 0 auto 0 0; border-radius: 3px; }
+.pscore b { font: 500 0.95rem/1 var(--f-data); min-width: 2.6ch; text-align: right; }
+.chip { font: 600 0.72rem/1 var(--f-body); text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 7px; border-radius: 5px; white-space: nowrap; }
+.chip.green { background: var(--good-wash); color: var(--good-ink); }
+.chip.amber { background: var(--warn-wash); color: var(--warn-ink); }
+.chip.red { background: var(--critical-wash); color: var(--critical-ink); }
+.chip.none { background: var(--line); color: var(--ink-2); }
+.table-wrap { overflow-x: auto; border-top: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th { text-align: left; font: 600 0.72rem/1.2 var(--f-body); text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td.num { font-family: var(--f-data); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td .det { color: var(--ink-2); font-size: 0.85rem; margin-top: 3px; }
+td .src { color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
+.kind { font: 500 0.7rem/1 var(--f-data); color: var(--muted); }
+.tw { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.tw li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start; font-size: 0.92rem; }
+.news { display: grid; gap: 12px; }
+.news h3 { font-size: 0.95rem; }
+.news ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: 0.88rem; }
+.news .meta { color: var(--muted); font-size: 0.8rem; }
+.health li { font-size: 0.9rem; }
+.foot { font-size: 0.85rem; color: var(--muted); max-width: 75ch; }
+[data-mode="easy"] .expert-only, [data-mode="expert"] .easy-only { display: none; }
+
+@media (max-width: 760px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .hero-side { border-left: 0; border-top: 1px solid var(--line); }
+  .grid2 { grid-template-columns: minmax(0, 1fr); }
+  .path { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 16px; }
+  .composites { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .composites > div:nth-child(3) { border-left: 0; }
+  .composites > div:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .pscore .track { width: 64px; }
+  .pillar > summary { grid-template-columns: 30px minmax(0, 1fr) auto; gap: 10px; padding: 12px 14px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">
+      <h1>AI Bubble Monitor</h1>
+      <span class="asof" id="asof"></span>
+    </div>
+    <div class="seg" role="group" aria-label="View">
+      <button type="button" id="btn-easy" aria-pressed="true">Easy</button>
+      <button type="button" id="btn-expert" aria-pressed="false">Expert</button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap" id="app" data-mode="easy">
+  <section class="hero" id="hero" aria-label="Current risk level"></section>
+
+  <!-- EASY MODE -->
+  <div class="grid2 easy-only">
+    <section class="panel">
+      <header><span class="eyebrow">Right now</span><h2>What's happening</h2></header>
+      <ul class="list" id="happening"></ul>
+      <p class="callout" id="edgecore" hidden></p>
+    </section>
+    <section class="panel">
+      <header><span class="eyebrow">Still holding up</span><h2>The good news</h2></header>
+      <ul class="list" id="bright"></ul>
+      <header><span class="eyebrow">Since last time</span><h2>What changed</h2></header>
+      <ul class="list" id="changed"></ul>
+    </section>
+  </div>
+
+  <section class="panel easy-only">
+    <header><span class="eyebrow">How booms usually end</span><h2>The usual path of a bust, and where we are on it</h2>
+      <p class="muted">In past tech booms these steps came roughly in this order. The order can vary.</p></header>
+    <ol class="path" id="path"></ol>
+  </section>
+
+  <div class="grid2 easy-only">
+    <section class="panel">
+      <header><span class="eyebrow">Looking ahead</span><h2>Where this might lead</h2></header>
+      <p id="leads"></p>
+      <p id="nextstage" class="callout" hidden></p>
+      <h3>What would ease the worry</h3>
+      <ul class="list" id="calming"></ul>
+    </section>
+    <section class="panel">
+      <header><span class="eyebrow">Next 45 days</span><h2>Dates to watch</h2></header>
+      <ul class="cal" id="cal-easy"></ul>
+    </section>
+  </div>
+
+  <!-- EXPERT MODE -->
+  <section class="composites expert-only" id="composites"></section>
+  <section class="panel expert-only">
+    <header><span class="eyebrow">Regime logic</span><h2 id="regime-why"></h2></header>
+    <p class="muted" id="regime-rules"></p>
+  </section>
+  <section class="pillars expert-only" id="pillars"></section>
+  <div class="grid2 expert-only">
+    <section class="panel">
+      <header><span class="eyebrow">Event tripwires</span><h2>Binary events that lift the regime</h2>
+        <p class="muted">A tripwire fires only when you record it with two credible sources.</p></header>
+      <ul class="tw" id="tripwires"></ul>
+    </section>
+    <section class="panel">
+      <header><span class="eyebrow">Headline scan, last 3 days</span><h2>Possible tripwires to review</h2>
+        <p class="muted">Keyword matches from Google News. Most are noise; none of these has fired anything.</p></header>
+      <div class="news" id="news"></div>
+    </section>
+  </div>
+  <div class="grid2 expert-only">
+    <section class="panel">
+      <header><span class="eyebrow">Catalyst calendar</span><h2>Upcoming tests</h2></header>
+      <ul class="cal" id="cal-expert"></ul>
+    </section>
+    <section class="panel health">
+      <header><span class="eyebrow">Data health</span><h2>Readings that need updating</h2></header>
+      <ul class="list" id="health"></ul>
+    </section>
+  </div>
+
+  <!-- BOTH -->
+  <section class="panel">
+    <header><span class="eyebrow">Past year</span><h2>Has the risk been building?</h2>
+      <p class="muted" id="chart-note"></p></header>
+    <div class="legend" id="legend"></div>
+    <div class="chart-box" id="chart"></div>
+  </section>
+
+  <p class="foot">A risk monitor, not a timing model and not investment advice. It measures how likely and how severe a fall looks; it cannot say when. Readings entered by hand come from news and secondary sources and should be checked against the primary source.</p>
+</main>
+
+<script id="data" type="application/json">/*__DATA__*/</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById("data").textContent);
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const fmtDate = (d) => new Date(d + "T12:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+  const shortDate = (d) => new Date(d + "T12:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+  const LVL = {
+    green: ["var(--good)", "var(--good-wash)", "var(--good-ink)"],
+    yellow: ["var(--warn)", "var(--warn-wash)", "var(--warn-ink)"],
+    orange: ["var(--serious)", "var(--serious-wash)", "var(--serious-ink)"],
+    red: ["var(--critical)", "var(--critical-wash)", "var(--critical-ink)"],
+  };
+  const LEVEL_NAMES = [["Calm", "green"], ["Fragile", "yellow"], ["Cracking", "orange"], ["Unwinding", "red"]];
+  const levelWord = { green: "Green", amber: "Amber", red: "Red" };
+
+  // Mode toggle, remembered per viewer.
+  function setMode(m) {
+    $("app").dataset.mode = m;
+    $("btn-easy").setAttribute("aria-pressed", m === "easy");
+    $("btn-expert").setAttribute("aria-pressed", m === "expert");
+    try { localStorage.setItem("abm-mode", m); } catch (e) {}
+  }
+  $("btn-easy").onclick = () => setMode("easy");
+  $("btn-expert").onclick = () => setMode("expert");
+  let saved = null;
+  try { saved = localStorage.getItem("abm-mode"); } catch (e) {}
+  setMode(saved === "expert" ? "expert" : "easy");
+
+  const E = D.easy;
+  $("asof").textContent = "Data as of " + fmtDate(D.asof) + " · updated " + D.generated;
+
+  // Hero
+  const [c, wash, ink] = LVL[E.color];
+  const hero = $("hero");
+  hero.style.setProperty("--lvl", c); hero.style.setProperty("--lvl-wash", wash); hero.style.setProperty("--lvl-ink", ink);
+  const meters = E.meters.map((m) => `
+    <div class="meter">
+      <div class="meter-head"><span class="eyebrow">${esc(m.name)}</span><b>${m.score == null ? "–" : Math.round(m.score)}</b></div>
+      <div class="meter-bar" role="img" aria-label="${esc(m.name)}: ${m.score == null ? "no data" : Math.round(m.score) + " of 100"}">
+        ${m.score == null ? "" : `<i style="left:${Math.max(0, Math.min(100, m.score))}%"></i>`}</div>
+      <p>${esc(m.words)}</p>
+    </div>`).join("");
+  hero.innerHTML = `
+    <div class="hero-main">
+      <span class="eyebrow">Risk level ${E.level} of 4</span>
+      <div class="lvl-name">${esc(E.label)}</div>
+      <p class="headline">${esc(E.headline)}</p>
+      <div class="scale" aria-hidden="true">${LEVEL_NAMES.map(([n, col], i) =>
+        `<div class="${i + 1 === E.level ? "on" : ""}" style="--c:${LVL[col][0]}"><i></i><span>${n}</span></div>`).join("")}</div>
+    </div>
+    <div class="hero-side">${meters}</div>`;
+
+  // Easy: happening
+  $("happening").innerHTML = E.happening.length ? E.happening.map((h) =>
+    `<li><span class="dot ${h.level}" aria-hidden="true"></span><span>${esc(h.text)}</span></li>`).join("")
+    : `<li><span class="dot green"></span><span>Nothing is flashing amber or red.</span></li>`;
+  if (E.edge_core) { $("edgecore").textContent = E.edge_core; $("edgecore").hidden = false; }
+  $("bright").innerHTML = E.bright_side.length ? E.bright_side.map((t) =>
+    `<li><span class="dot green" aria-hidden="true"></span><span>${esc(t)}</span></li>`).join("")
+    : `<li><span class="dot" aria-hidden="true"></span><span>None of the core demand signals is green right now.</span></li>`;
+  $("changed").innerHTML = E.changed.length ? E.changed.slice(0, 6).map((x) =>
+    `<li><span class="dot ${/worse|worsened|fired/.test(x.text) ? "amber" : "green"}" aria-hidden="true"></span><span>${esc(x.text)}</span></li>`).join("")
+    : `<li><span class="dot" aria-hidden="true"></span><span>No meaningful change over the past week.</span></li>`;
+
+  // Easy: bust path
+  $("path").innerHTML = E.stages.map((s, i) => `
+    <li class="${s.state}">
+      <span class="num">${i + 1}</span>
+      <div class="bar"></div>
+      <span class="st">${esc(s.words)}</span>
+      <p>${esc(s.plain)}</p>
+    </li>`).join("");
+
+  // Easy: where it leads
+  $("leads").textContent = E.where_it_leads;
+  if (E.next_stage) {
+    $("nextstage").innerHTML = `<strong>Next step to watch for:</strong> ${esc(E.next_stage.plain)}`;
+    $("nextstage").hidden = false;
+  }
+  $("calming").innerHTML = E.calming.map((t) =>
+    `<li><span class="dot green" aria-hidden="true"></span><span>${esc(t)}</span></li>`).join("");
+
+  // Calendars
+  const calItem = (c, expert) => `
+    <li><div class="when"><b>${shortDate(c.date)}</b><span>${c.in_days === 0 ? "today" : "in " + c.in_days + "d"}</span></div>
+      <div class="ev"><strong>${esc(c.event)}</strong><p>${esc(expert ? c.watch : c.plain)}</p></div></li>`;
+  $("cal-easy").innerHTML = E.watch_next.map((c) => calItem(c, false)).join("") || `<li><div></div><div class="ev"><p>No dated events in the next 45 days.</p></div></li>`;
+  $("cal-expert").innerHTML = D.catalysts.map((c) => calItem(c, true)).join("");
+
+  // Expert: composites
+  const R = D.regime;
+  $("composites").innerHTML = `
+    <div><span class="eyebrow">Regime</span><b>${R.regime} · ${esc(R.name)}</b><p>${esc(E.label)} in easy mode</p></div>
+    <div><span class="eyebrow">Turn Index</span><b>${D.turn ?? "–"}</b><p>Fast: A, B, C, D, G</p></div>
+    <div><span class="eyebrow">Vulnerability</span><b>${D.vuln ?? "–"}</b><p>Slow: E, F, funding structure</p></div>
+    <div><span class="eyebrow">Edge vs core</span><b>${D.edge_core.edge ?? "–"} / ${D.edge_core.core ?? "–"}</b><p>Weak links vs megacaps</p></div>`;
+  $("regime-why").textContent = `${R.name}: ${R.why}`;
+  $("regime-rules").innerHTML = `Rules (brief §12, highest met wins): <b>Unwind</b> = 3+ fast pillars red incl. A or B, plus HY widening, or 2 tripwires · <b>Cracking</b> = 2+ fast pillars red or any tripwire · <b>Fragile</b> = Turn ≥ 33 · <b>Boom</b> = Turn &lt; 33. A pillar counts as red after 5 of the last 10 sessions at 67+. Fast pillars red today: ${R.red_now.length ? R.red_now.join(", ") : "none"}; confirmed: ${R.red_confirmed.length ? R.red_confirmed.join(", ") : "none"}.`;
+
+  // Expert: pillars
+  const lvlColor = { green: "var(--good)", amber: "var(--warn)", red: "var(--critical)" };
+  $("pillars").innerHTML = D.pillars.map((p) => `
+    <details class="pillar" ${p.level === "red" || p.level === "amber" ? "open" : ""}>
+      <summary>
+        <span class="code">${esc(p.id)}</span>
+        <span class="pname"><h3>${esc(p.name)}</h3><small>${esc(p.plain)} · ${p.composite === "turn" ? "Turn" : "Vulnerability"} · ${p.n} of ${p.total} indicators live</small></span>
+        <span class="pscore"><span class="track"><i style="width:${p.score ?? 0}%;background:${lvlColor[p.level] || "var(--muted)"}"></i></span>
+          <b>${p.score == null ? "–" : Math.round(p.score)}</b>
+          <span class="chip ${p.level || "none"}">${p.level ? levelWord[p.level] : "No data"}</span></span>
+      </summary>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Indicator</th><th>Reading</th><th>Score</th><th>As of</th></tr></thead>
+        <tbody>${p.indicators.map((i) => `
+          <tr>
+            <td><div>${esc(i.name)} <span class="kind">${i.kind === "auto" ? "AUTO" : "MANUAL"}</span></div>
+              ${i.detail ? `<div class="det">${esc(i.detail)}</div>` : ""}
+              ${i.source && i.kind !== "auto" ? `<div class="src">${esc(i.source)}</div>` : ""}</td>
+            <td class="num">${esc(i.value_fmt ?? "")}</td>
+            <td class="num">${i.score != null ? `<span class="chip ${i.level}">${Math.round(i.score)}</span>`
+              : `<span class="chip none">${esc(i.status)}${i.stale_score != null ? " · " + Math.round(i.stale_score) : ""}</span>`}</td>
+            <td class="num">${i.date ? esc(i.date) : "–"}</td>
+          </tr>`).join("")}</tbody>
+      </table></div>
+    </details>`).join("");
+
+  // Expert: tripwires
+  $("tripwires").innerHTML = D.tripwires.map((t) => `
+    <li><span class="chip ${t.status === "fired" ? "red" : t.status === "candidate" ? "amber" : "none"}">${t.status === "fired" ? "Fired" : t.status === "candidate" ? "Review" : "Not fired"}</span>
+      <span>${esc(t.desc)}${t.date ? ` <span class="muted">(${esc(t.date)})</span>` : ""}</span></li>`).join("");
+  const news = Object.entries(D.news || {});
+  $("news").innerHTML = news.length ? news.map(([tid, items]) => `
+    <div><h3>${esc((D.tripwires.find((t) => t.id === tid) || {}).desc || tid)}</h3>
+      <ul>${items.slice(0, 3).map((h) => `<li><a href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.title)}</a> <span class="meta">${esc(h.date)}</span></li>`).join("")}</ul></div>`).join("")
+    : `<p class="muted">No headline scan in this run.</p>`;
+  $("health").innerHTML = D.health.length ? D.health.map((h) =>
+    `<li><span class="dot ${h.kind === "failed" ? "red" : "amber"}" aria-hidden="true"></span><span><b>${esc(h.name)}</b>: ${esc(h.text)}</span></li>`).join("")
+    : `<li><span class="dot green"></span><span>Every source fetched and every hand-entered reading is current.</span></li>`;
+
+  // History chart: Turn and Vulnerability, one shared 0-100 axis.
+  const H = D.history;
+  $("chart-note").textContent = "Daily scores from 0 to 100. Shaded bands mark green (0-33), amber (34-66) and red (67-100). Most hand-entered readings (lab revenue, credit insurance, fund-manager surveys) only exist from "
+    + fmtDate(D.manual_start) + ", so earlier scores rest mostly on market prices and official data.";
+  $("legend").innerHTML = `<span><i style="background:var(--s1)"></i>Has a fall started? (Turn Index)</span><span><i style="background:var(--s2)"></i>How far could prices fall? (Vulnerability)</span>`;
+  function drawChart() {
+    const box = $("chart");
+    const W = Math.max(320, box.clientWidth || 900), Hh = W < 560 ? 220 : 280;
+    const m = { l: 34, r: 16, t: 10, b: 26 };
+    const iw = W - m.l - m.r, ih = Hh - m.t - m.b;
+    const n = H.length;
+    const x = (i) => m.l + (n <= 1 ? 0 : (i / (n - 1)) * iw);
+    const y = (v) => m.t + ih - (v / 100) * ih;
+    const line = (k) => {
+      let d = "", pen = false;
+      H.forEach((p, i) => { if (p[k] == null) { pen = false; return; } d += (pen ? "L" : "M") + x(i).toFixed(1) + " " + y(p[k]).toFixed(1); pen = true; });
+      return d;
+    };
+    const ticks = [0, 33, 67, 100];
+    const months = [];
+    H.forEach((p, i) => { if (i === 0 || p.d.slice(5, 7) !== H[i - 1].d.slice(5, 7)) months.push(i); });
+    const step = W < 560 ? 3 : 2;
+    const msIdx = H.findIndex((p) => p.d >= D.manual_start);
+    let svg = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Turn Index and Vulnerability Index over the past year">`;
+    svg += `<rect x="${m.l}" y="${y(100)}" width="${iw}" height="${y(67) - y(100)}" fill="var(--critical-wash)" opacity="0.55"/>`;
+    svg += `<rect x="${m.l}" y="${y(67)}" width="${iw}" height="${y(33) - y(67)}" fill="var(--warn-wash)" opacity="0.55"/>`;
+    ticks.forEach((t) => {
+      svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)" stroke-width="1"/>`;
+      svg += `<text x="${m.l - 8}" y="${y(t) + 4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono, monospace">${t}</text>`;
+    });
+    months.forEach((i, j) => {
+      if (j % step) return;
+      svg += `<text x="${x(i)}" y="${Hh - 6}" font-size="11" fill="var(--muted)" text-anchor="${i === 0 ? "start" : "middle"}">${new Date(H[i].d + "T12:00:00Z").toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" })}</text>`;
+    });
+    if (msIdx > 0) {
+      svg += `<line x1="${x(msIdx)}" x2="${x(msIdx)}" y1="${m.t}" y2="${m.t + ih}" stroke="var(--line-strong)" stroke-width="1"/>`;
+      const nearRight = x(msIdx) > m.l + iw * 0.6;
+      svg += `<text x="${x(msIdx) + (nearRight ? -6 : 6)}" y="${m.t + 12}" font-size="11" fill="var(--muted)" text-anchor="${nearRight ? "end" : "start"}">full data from here</text>`;
+    }
+    svg += `<path d="${line("v")}" fill="none" stroke="var(--s2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    svg += `<path d="${line("t")}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    const last = H[n - 1];
+    [["t", "var(--s1)"], ["v", "var(--s2)"]].forEach(([k, col]) => {
+      if (last[k] == null) return;
+      svg += `<circle cx="${x(n - 1)}" cy="${y(last[k])}" r="4.5" fill="${col}" stroke="var(--surface)" stroke-width="2"/>`;
+    });
+    svg += `<line id="xh" x1="0" x2="0" y1="${m.t}" y2="${m.t + ih}" stroke="var(--muted)" stroke-width="1" visibility="hidden"/>`;
+    svg += `<rect id="hit" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/>`;
+    svg += `</svg><div class="tip" id="tip" hidden></div>`;
+    box.innerHTML = svg;
+    const hit = box.querySelector("#hit"), xh = box.querySelector("#xh"), tip = box.querySelector("#tip");
+    const regimeName = ["", "Boom", "Fragile", "Cracking", "Unwind"];
+    function show(evt) {
+      const r = box.querySelector("svg").getBoundingClientRect();
+      const px = ((evt.clientX - r.left) / r.width) * W;
+      const i = Math.max(0, Math.min(n - 1, Math.round(((px - m.l) / iw) * (n - 1))));
+      const p = H[i];
+      xh.setAttribute("x1", x(i)); xh.setAttribute("x2", x(i)); xh.setAttribute("visibility", "visible");
+      tip.innerHTML = `<b>${fmtDate(p.d)}</b>
+        <div class="row"><span><i style="background:var(--s1)"></i>Turn</span><b class="mono">${p.t ?? "–"}</b></div>
+        <div class="row"><span><i style="background:var(--s2)"></i>Vulnerability</span><b class="mono">${p.v ?? "–"}</b></div>
+        <div class="row"><span>Regime</span><b>${regimeName[p.r]}</b></div>`;
+      tip.hidden = false;
+      const left = (x(i) / W) * r.width;
+      tip.style.left = Math.min(r.width - 170, Math.max(0, left + 12)) + "px";
+      tip.style.top = "8px";
+    }
+    hit.addEventListener("pointermove", show);
+    hit.addEventListener("pointerdown", show);
+    hit.addEventListener("pointerleave", () => { tip.hidden = true; xh.setAttribute("visibility", "hidden"); });
+  }
+  drawChart();
+  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawChart, 120); });
+})();
+</script>

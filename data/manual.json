@@ -1,0 +1,423 @@
+{
+ "_help": "Hand-entered readings. Add entries with `python monitor.py add <indicator> <value|green|amber|red> --note ... --source ...` or edit this file. The latest entry on or before a date counts; older entries stay as history.",
+ "readings": {
+  "lab_revenue_growth": [
+   {
+    "date": "2026-07-15",
+    "note": "Anthropic Q2 revenue growth q/q",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 147
+   },
+   {
+    "date": "2026-10-14",
+    "note": "Anthropic Q3 revenue $16.8B, +45% q/q; OpenAI ~$50B net run-rate",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 45
+   }
+  ],
+  "revenue_quality": [
+   {
+    "date": "2026-10-08",
+    "note": "OpenAI run-rate cut from ~$70B to ~$50B on a net basis; AI stocks fell on the news",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "amber"
+   }
+  ],
+  "cloud_growth": [
+   {
+    "date": "2026-04-30",
+    "note": "Q1 2026: Azure +40%, Google Cloud +63% ($20B), AWS +28%. Q2 figures not in the brief; update after Q3 results (27-30 Oct)",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "green"
+   }
+  ],
+  "gpu_rent": [
+   {
+    "date": "2026-10-15",
+    "note": "Ornn H100 $3.13/GPU-hour vs a 3-month range of $2.46-3.17; H200 $6.51, B200 $7.92",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 1.3
+   }
+  ],
+  "token_growth": [
+   {
+    "date": "2026-05-20",
+    "note": "Google 3.2 quadrillion tokens a month in May, about 7x y/y",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "green"
+   }
+  ],
+  "lab_unit_economics": [
+   {
+    "date": "2026-10-14",
+    "note": "Anthropic $1.70 revenue per $1 of compute in Q3; adjusted operating margin 11%",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 1.7
+   }
+  ],
+  "startup_failures": [
+   {
+    "date": "2026-10-13",
+    "note": "Character.AI filed for Chapter 11 on 13 Oct",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "amber"
+   }
+  ],
+  "capex_guidance": [
+   {
+    "date": "2026-07-30",
+    "note": "2026 guidance ~$732.5B (MSFT, GOOGL, AMZN, META) vs ~$410B in 2025; 2027 consensus ~$934.5B; every 2026 revision upward",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "green"
+   }
+  ],
+  "nvidia_guide": [
+   {
+    "date": "2026-08-26",
+    "note": "Q3 FY27 guide $108B +/-2% vs Q2 revenue $96.2B; gross margin to bottom at 71-72%",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 12.2
+   }
+  ],
+  "tsmc_revenue": [
+   {
+    "date": "2026-10-10",
+    "note": "September NT$511.9B, +54.6% y/y; Q4 guide $52.3-54.3B",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 54.6
+   }
+  ],
+  "korea_chip_exports": [
+   {
+    "date": "2026-10-01",
+    "note": "September chip exports $60.3B, +263% y/y",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 263
+   },
+   {
+    "date": "2026-10-11",
+    "note": "1-10 October preliminary, +46.7% y/y. Ten-day data swing with working days (Chuseok); compare per working day",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 46.7
+   }
+  ],
+  "dram_contract": [
+   {
+    "date": "2026-01-05",
+    "note": "Q1 contract +90-95% q/q",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 92.5
+   },
+   {
+    "date": "2026-03-31",
+    "note": "Q2 contract +58-63% q/q",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 60.5
+   },
+   {
+    "date": "2026-06-30",
+    "note": "Q3 forecast +13-18% q/q",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 15.5
+   },
+   {
+    "date": "2026-09-30",
+    "note": "Q4 forecast +10-15% q/q (TrendForce); spot trading weak; CXMT progress hit Korean memory stocks 13 Oct",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 12.5
+   }
+  ],
+  "dc_construction": [
+   {
+    "date": "2026-10-01",
+    "note": "August record $84.95B annual rate, +73% y/y (Census C30)",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 73
+   }
+  ],
+  "ai_gdp_share": [
+   {
+    "date": "2026-06-30",
+    "note": "Epoch AI: AI infrastructure ~0.8% of GDP in Q1 2026 (all computing ~1.4-1.5%)",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 0.8
+   }
+  ],
+  "cancellations": [
+   {
+    "date": "2026-10-15",
+    "note": "Meta floated selling excess capacity; local opposition had blocked ~$130B of projects by July",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "amber"
+   }
+  ],
+  "supplier_tone": [
+   {
+    "date": "2026-09-11",
+    "note": "Broadcom guides AI chip sales from ~$58B (FY26) to $230B (FY28) but says capital may become the constraint",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "green"
+   }
+  ],
+  "coreweave_cds": [
+   {
+    "date": "2026-10-16",
+    "note": "CDS above 1,000bp (record ~1,195bp); Oct 2031 bond briefly yielded over 16%",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 1100
+   }
+  ],
+  "oracle_cds": [
+   {
+    "date": "2026-10-16",
+    "note": "Record 288-295bp; S&P BBB-, one notch above junk; ~$160B of debt",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 292
+   }
+  ],
+  "private_credit": [
+   {
+    "date": "2026-10-15",
+    "note": "Blue Owl gated two funds in H1 and failed to finance a $4B data center; Oracle lease-deferral clause disclosed",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "amber"
+   }
+  ],
+  "ipo_window": [
+   {
+    "date": "2026-10-10",
+    "note": "SpaceX ~50% below its post-IPO peak by late July; Firmus pulled its IPO; Anthropic targets November",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "amber"
+   }
+  ],
+  "ai_cds_other": [
+   {
+    "date": "2026-10-08",
+    "note": "SoftBank CDS 424bp; Broadcom record 136bp",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "amber"
+   }
+  ],
+  "debt_share_capex": [
+   {
+    "date": "2026-08-15",
+    "note": "Debt funded 32% of hyperscaler capex over 12 months vs 9% in FY24 (FactSet)",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 32
+   }
+  ],
+  "vendor_financing": [
+   {
+    "date": "2026-08-27",
+    "note": "Nvidia guarantee exposure up to $108.5B incl. up to $105B for OpenAI's Ohio leases; private stakes $42.3B vs $3.2B a year earlier",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "amber"
+   }
+  ],
+  "beat_and_fall": [
+   {
+    "date": "2026-08-27",
+    "note": "Nvidia fell the day after each of its last four reports",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 4
+   }
+  ],
+  "cape": [
+   {
+    "date": "2026-10-01",
+    "note": "Shiller CAPE ~41, above 40 since May (Dec 1999 peak 44.2)",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 41
+   }
+  ],
+  "forward_pe": [
+   {
+    "date": "2026-05-15",
+    "note": "S&P 500 forward P/E ~22 in May; needs a current FactSet reading",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 22
+   }
+  ],
+  "top10_weight": [
+   {
+    "date": "2026-10-15",
+    "note": "Top 10 ~39% of the S&P 500; Nvidia ~7.8-8%",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 39
+   }
+  ],
+  "bofa_cash": [
+   {
+    "date": "2026-10-14",
+    "note": "October survey; under the 4.0% sell trigger",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 3.9
+   }
+  ],
+  "bofa_bullbear": [
+   {
+    "date": "2026-10-14",
+    "note": "Above the 8.0 sell trigger; net 37% overweight tech; long semis most crowded (45%)",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 8.1
+   }
+  ],
+  "leveraged_etf": [
+   {
+    "date": "2026-06-30",
+    "note": "Global leveraged-ETF assets above $290B (June)",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "amber"
+   }
+  ],
+  "retail_flows": [
+   {
+    "date": "2026-10-16",
+    "note": "Retail bought a net $66M of CoreWeave in the week of 12 Oct, second-largest week on record",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "amber"
+   }
+  ],
+  "narrative": [
+   {
+    "date": "2026-10-15",
+    "note": "Broadcom CEO likened AI investing to a casino; Dalio and Burry warnings; IMF GFSR lists an AI-led correction",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "level": "amber"
+   }
+  ],
+  "fed_hike_odds": [
+   {
+    "date": "2026-10-16",
+    "note": "~85% odds of an October hold; ~77% odds of a December hike",
+    "source": "Research brief, 19 Oct 2026 (news and secondary trackers; verify against the primary source)",
+    "value": 77
+   }
+  ]
+ },
+ "tripwires": {
+  "capex_cut": {
+   "status": "not_fired"
+  },
+  "nvidia_guide": {
+   "status": "not_fired"
+  },
+  "dc_cancellations": {
+   "status": "not_fired"
+  },
+  "memory_price_fall": {
+   "status": "not_fired"
+  },
+  "gpu_rent_collapse": {
+   "status": "not_fired"
+  },
+  "lab_down_round": {
+   "status": "not_fired"
+  },
+  "openai_defers": {
+   "status": "not_fired"
+  },
+  "neocloud_distress": {
+   "status": "not_fired"
+  },
+  "oracle_junk": {
+   "status": "not_fired"
+  },
+  "private_credit_gate": {
+   "status": "not_fired"
+  },
+  "guarantee_called": {
+   "status": "not_fired"
+  },
+  "efficiency_shock": {
+   "status": "not_fired"
+  },
+  "fed_hawkish": {
+   "status": "not_fired"
+  },
+  "geopolitics": {
+   "status": "not_fired"
+  },
+  "depreciation": {
+   "status": "not_fired"
+  },
+  "going_concern": {
+   "status": "not_fired"
+  }
+ },
+ "catalysts": [
+  {
+   "date": "2026-10-21",
+   "event": "Korea exports, 1-20 October",
+   "watch": "Chip export growth vs +46.7% in the first ten days",
+   "plain": "South Korea's chip exports are the earliest hard data on chip demand. A sharp slowdown would be an early warning."
+  },
+  {
+   "date": "2026-10-28",
+   "event": "FOMC decision (2pm ET)",
+   "watch": "Hike or hold; guidance on December",
+   "plain": "The Fed decides on interest rates. Another rise, or hints of one, makes borrowing for AI more expensive."
+  },
+  {
+   "date": "2026-10-29",
+   "event": "Q3 results: Microsoft, Alphabet, Meta, Amazon (expected 27-30 Oct)",
+   "watch": "2026 capex vs guidance, first 2027 capex color, cloud growth, AI revenue, financing plans",
+   "plain": "The biggest test of the month. If any of them cuts AI spending plans, that is historically the clearest sign a boom is ending."
+  },
+  {
+   "date": "2026-11-01",
+   "event": "Korea October exports (trade ministry)",
+   "watch": "Chip export growth y/y",
+   "plain": "Full-month chip export numbers from South Korea."
+  },
+  {
+   "date": "2026-11-03",
+   "event": "US midterm elections",
+   "watch": "Policy and fiscal risk",
+   "plain": "The election could change taxes, spending and trade policy."
+  },
+  {
+   "date": "2026-11-10",
+   "event": "TSMC October revenue",
+   "watch": "y/y growth vs 54.6% in September",
+   "plain": "TSMC makes most AI chips; its monthly sales show whether demand is holding."
+  },
+  {
+   "date": "2026-11-15",
+   "event": "US October CPI; BofA November survey; CoreWeave Q3 results (to be confirmed)",
+   "watch": "Inflation path; fund-manager cash and crowded trade; neocloud liquidity and backlog",
+   "plain": "Inflation decides the Fed's next step, the survey shows how crowded investors are, and CoreWeave's results show how the most indebted AI company is coping."
+  },
+  {
+   "date": "2026-11-18",
+   "event": "Nvidia Q3 FY27 results (after close) and FOMC minutes",
+   "watch": "Revenue vs the $108B guide, FY28 outlook, DSO, guarantees, and the share-price reaction",
+   "plain": "Nvidia is the bellwether of the AI boom. Watch the share price the next day: falling even on great results means good news is already priced in."
+  },
+  {
+   "date": "2026-11-25",
+   "event": "Anthropic IPO window (not confirmed)",
+   "watch": "Pricing vs the $965B private round and $1.5-2T talk; first-month trading",
+   "plain": "If the listing is delayed, priced low, or trades below its first price, money for AI is drying up."
+  },
+  {
+   "date": "2026-12-09",
+   "event": "FOMC with projections",
+   "watch": "~77% odds of a hike priced as of 19 Oct; the dot plot",
+   "plain": "Another Fed decision on interest rates, with its forecast for next year."
+  },
+  {
+   "date": "2026-12-15",
+   "event": "Oracle, Broadcom and Micron results (to be confirmed)",
+   "watch": "Oracle capex and financing; Broadcom customer backstops; memory pricing",
+   "plain": "Oracle is the biggest borrower in the AI build-out; Micron shows where memory prices are heading."
+  },
+  {
+   "date": "2027-02-01",
+   "event": "OpenAI IPO (expected early 2027)",
+   "watch": "The same funding-window tests as Anthropic",
+   "plain": "Another test of whether investors will keep paying high prices for AI companies."
+  }
+ ]
+}
