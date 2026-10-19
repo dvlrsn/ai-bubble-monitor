@@ -97,6 +97,8 @@ Subscribe to the same topic in the ntfy app. Without a topic, alerts are only pr
 
 To see the latest daily reading on the PC, run `scripts/open-dashboard.ps1` (there is a desktop shortcut for it). It downloads that run's dashboard with `gh` and opens it, or builds one locally if GitHub can't be reached.
 
+**AI headline review** (`python monitor.py review`, desktop shortcut "AI Bubble Review"): Claude, through the local Claude Code CLI with only web search and web reading allowed, checks the headline scan and marks each tripwire fire / watch / noise. The result opens as `out/ai_review.html`. Nothing fires unless you answer `y`, and a fire needs two credible sources; a confirmed fire is committed, pushed and followed by a fresh daily run, so the phone alert comes from Actions. It uses your Claude plan, so run `claude auth login` once first.
+
 Hand-entered readings (`add`, `tripwire fire`) change `data/manual.json`: commit and push it so the next daily run uses them.
 
 ## How the scoring works (brief §12)

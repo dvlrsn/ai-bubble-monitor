@@ -7,6 +7,7 @@
   python monitor.py add ID VALUE     add a reading (a number, or green/amber/red)
   python monitor.py tripwire ...     list, fire or clear event tripwires
   python monitor.py backtest         how the price-and-credit layer behaved in past busts
+  python monitor.py review           Claude checks the headline scan and suggests tripwires to fire
 """
 
 import argparse
@@ -168,6 +169,48 @@ def cmd_tripwire(a):
     save_manual(m)
 
 
+def cmd_review(a):
+    import subprocess
+
+    from abm import ROOT, review
+
+    m = load_manual()
+    res, path = review.run(m)
+    webbrowser.open(path.as_uri())
+    print(f"\n{res['overall']}\n")
+    for v in res["verdicts"]:
+        if v["verdict"] != "noise":
+            print(f"[{v['verdict'].upper():5}] {TRIPWIRES[v['tripwire']][1]}\n        {v['summary']}")
+    fires = [v for v in res["verdicts"] if v["verdict"] == "fire" and len(v["sources"]) >= 2]
+    if not fires:
+        print("\nNothing to fire. The full review is open in your browser.")
+        return
+    fired = []
+    for v in fires:
+        print(f"\nClaude suggests firing: {TRIPWIRES[v['tripwire']][1]}\n  {v['why']}")
+        for s in v["sources"]:
+            print(f"  - {s['outlet']}: {s['url']}")
+        if input("Fire this tripwire? It raises the risk level. [y/N] ").strip().lower() == "y":
+            m.setdefault("tripwires", {})[v["tripwire"]] = {
+                "status": "fired", "date": date.today().isoformat(), "sources": [s["url"] for s in v["sources"]],
+                "note": f"AI review: {v['summary']}", "expires_days": 120}
+            fired.append(v["tripwire"])
+    if not fired:
+        print("Nothing fired.")
+        return
+    save_manual(m)
+    print(f"Fired: {', '.join(fired)}. Uploading so the daily check uses it, and rerunning it now...")
+    git = lambda *args: subprocess.run(["git", *args], cwd=ROOT, check=True)
+    try:
+        git("add", "data/manual.json")
+        git("commit", "-q", "-m", f"Fire tripwire {', '.join(fired)} (AI review, confirmed by hand)")
+        git("push", "-q")
+        subprocess.run(["gh", "workflow", "run", "daily.yml"], cwd=ROOT, check=True)
+        print("Done. The phone alert follows when the run finishes (a few minutes).")
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        print(f"Saved here, but uploading failed ({e}). Ask Claude to push data/manual.json.")
+
+
 def cmd_backtest(a):
     from abm import backtest
     backtest.run()
@@ -206,6 +249,8 @@ def main():
     tw.set_defaults(fn=cmd_tripwire)
     bt = sub.add_parser("backtest", help="price-and-credit layer in past busts")
     bt.set_defaults(fn=cmd_backtest)
+    rv = sub.add_parser("review", help="Claude checks the headline scan and suggests tripwires")
+    rv.set_defaults(fn=cmd_review)
     a = p.parse_args()
     if a.cmd == "tripwire" and a.action != "list" and not a.id:
         p.error("tripwire fire/clear needs an id")
