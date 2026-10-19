@@ -95,6 +95,8 @@ Subscribe to the same topic in the ntfy app. Without a topic, alerts are only pr
 
 `.github/workflows/daily.yml` runs `python monitor.py run` every day at 05:00 UTC, and on demand from the Actions tab. It needs two repository secrets: `NTFY_TOPIC`, and `SEC_USER_AGENT` (a name plus contact email, which SEC asks every client to send; locally the same text goes in `data/config.json` as `sec_user_agent`, so it stays out of the public code). The archive `data/monitor.db` is not in git; the Actions cache carries it from run to run. If the cache is lost, the next run rebuilds it from the sources and only sets a new baseline, so a level change on that day goes unalerted. A failed run sends its own ntfy message, so silence never hides a broken check. Each run's dashboard is kept for 14 days as a downloadable artifact.
 
+To see the latest daily reading on the PC, run `scripts/open-dashboard.ps1` (there is a desktop shortcut for it). It downloads that run's dashboard with `gh` and opens it, or builds one locally if GitHub can't be reached.
+
 Hand-entered readings (`add`, `tripwire fire`) change `data/manual.json`: commit and push it so the next daily run uses them.
 
 ## How the scoring works (brief §12)
